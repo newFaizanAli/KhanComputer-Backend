@@ -1,0 +1,48 @@
+
+const express = require("express");
+const router = express.Router();
+const { db } = require("../../db");
+const { sale_invoices, customers, store_info, quotations, sale_invoice_items } = require("../../schemas");
+const { eq } = require("drizzle-orm");
+const { protect } = require("../../middleware/auth");
+
+router.get("/:id", protect, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [invoice] = await db
+            .select()
+            .from(sale_invoices)
+            .where(eq(sale_invoices.id, Number(id)));
+
+        if (!invoice)
+            return res.status(404).json({ success: false, message: "Invoice not found" });
+
+        const [customer] = invoice.customerId
+            ? await db.select().from(customers).where(eq(customers.id, invoice.customerId))
+            : [null];
+
+        const [store] = invoice.storeId
+            ? await db.select().from(store_info).where(eq(store_info.id, invoice.storeId))
+            : [null];
+
+        const [quotation] = invoice.quotationId ? await db.select().from(quotations).where(eq(quotations.id, invoice.quotationId))
+            : [null];
+
+        const items = await db
+            .select()
+            .from(sale_invoice_items)
+            .where(eq(sale_invoice_items.saleInvoiceId, Number(id)));
+
+        return res.json({
+            success: true,
+            data: { invoice, customer: customer || null, store: store || null, quotation: quotation || null, items },
+        });
+
+    } catch (error) {
+        console.error("Error fetching sale invoice preview data:", error);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+});
+
+module.exports = router;
