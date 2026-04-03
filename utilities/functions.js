@@ -11,6 +11,14 @@ async function hashPassword({ password }) {
 }
 
 
+
+async function comparePassword({ password, hash }) {
+    const isMatch = await bcrypt.compare(password, hash);
+    return isMatch;
+}
+
+
+
 async function checkPassword({ password, hashedPassword }) {
     const isMatch = await bcrypt.compare(password, hashedPassword);
     return isMatch;
@@ -25,5 +33,6 @@ const parseDate = (value) => {
 export {
     hashPassword,
     checkPassword,
-    parseDate
+    parseDate,
+    comparePassword
 }

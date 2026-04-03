@@ -1,14 +1,22 @@
 const express = require('express')
 const { db } = require('../db')
 const { users } = require('../schemas')
-const { eq } = require('drizzle-orm')
+const { eq, ne } = require('drizzle-orm')
+const { protect } = require('../middleware/auth')
+const { hashPassword } = require('../utilities/functions')
 
 const app = express()
 
-app.get('/', async (req, res) => {
+app.get('/', protect, async (req, res) => {
     try {
 
-        const allUsers = await db.select().from(users)
+        const { id } = req.user
+
+
+        const allUsers = await db.select().from(users).where(
+            ne(users.id, req.user.id) // exclude current user
+        )
+
         res.json({ success: true, data: allUsers })
 
     }
@@ -17,7 +25,39 @@ app.get('/', async (req, res) => {
     }
 })
 
-app.put('/:id', async (req, res) => {
+
+app.post('/', protect, async (req, res) => {
+    try {
+        const { name, email, password } = req.body
+
+        if (!name || !email || !password) {
+            return res.json({
+                success: false,
+                message: "Name, email, and password are required"
+            })
+        }
+
+        const hashedPassword = await hashPassword({ password })
+
+        const [newUser] = await db.insert(users).values({
+            name,
+            email,
+            password: hashedPassword,
+        }).returning()
+
+        res.json({
+            success: true,
+            message: "User added successfully",
+            data: newUser
+        })
+
+    } catch (e) {
+        console.error(e.message)
+        res.status(500).json({ success: false, message: 'Server Error' })
+    }
+})
+
+app.put('/:id', protect, async (req, res) => {
     try {
         const { id } = req.params;
         const { name, email, } = req.body;

@@ -4,9 +4,10 @@ const { users, store_info } = require('../schemas');
 const { hashPassword, checkPassword } = require("../utilities/functions");
 const { db } = require("../db");
 const { eq } = require("drizzle-orm");
-const { route } = require("../routes");
-const { protect } = require("../middleware/auth");
 const router = express.Router();
+
+
+router.use('/profile', require('./profile'));
 
 
 router.post("/register", async (req, res) => {
@@ -24,7 +25,7 @@ router.post("/register", async (req, res) => {
         const existingUser = await db
             .select()
             .from(users)
-            .where(users.email.eq(email));
+            .where(eq(users.email, email))
 
         if (existingUser.length > 0) {
             return res.json({ // 409 Conflict
@@ -115,13 +116,6 @@ router.post("/login", async (req, res) => {
     }
 });
 
-router.get("/profile", protect, async (req, res) => {
 
-    res.json({
-        success: true,
-        data: req.user
-    });
-
-});
 
 module.exports = router;
