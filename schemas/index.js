@@ -63,6 +63,7 @@ const quotations = pgTable('quotations', {
     discount: numeric("discount", { precision: 12, scale: 2 }).notNull().default(0),
     notes: text("notes").default(""),
     valid_until: timestamp('valid_until'),
+    is_tax_inclusive: boolean("is_tax_inclusive").default(false),
     date: timestamp('date').defaultNow().notNull(),
 })
 
@@ -85,6 +86,10 @@ const sale_invoices = pgTable('sale_invoices', {
     discount: numeric("discount", { precision: 12, scale: 2 }).notNull().default(0),
     date: timestamp('date').defaultNow().notNull(),
     notes: text("notes").default(""),
+    is_tax_inclusive: boolean("is_tax_inclusive").default(false),
+    payment_method: varchar("payment_method", { length: 20 }).default("cash"),
+    payment_reference: varchar("payment_reference", { length: 50 }).default(""),
+    payment_status: varchar("payment_status", { length: 20 }).default("unpaid"),
 });
 
 const sale_invoice_items = pgTable('sale_invoice_items', {

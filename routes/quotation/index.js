@@ -39,6 +39,7 @@ const quotationWithCustomerQuery = (condition) => {
             valid_until: quotations.valid_until,
             notes: quotations.notes,
             discount: quotations.discount,
+            is_tax_inclusive: quotations.is_tax_inclusive,
             gst: quotations.gst,
             customerId: customers.id,
             customerName: customers.name,
@@ -83,7 +84,7 @@ router.get('/', protect, async (req, resp) => {
 router.post('/', protect, async (req, res) => {
     try {
 
-        const { customerId, gst, discount, notes, valid_until, date } = req.body;
+        const { customerId, gst, discount, notes, valid_until, is_tax_inclusive, date } = req.body;
         const { store_id } = req.user;
 
 
@@ -104,6 +105,7 @@ router.post('/', protect, async (req, res) => {
             discount: discount,
             notes: notes,
             valid_until: parseDate(valid_until),
+            is_tax_inclusive,
             date: date
                 ? new Date(date + "T00:00:00.000Z")
                 : new Date()
@@ -128,7 +130,7 @@ router.post('/', protect, async (req, res) => {
 //  items: [{ quotationId, description, quantity, uom, price, gst, discount, total, notes }] }
 
 router.post('/combined', protect, async (req, res) => {
-    const { customerId, discount = 0, gst = 0, date, notes = '', valid_until, items } = req.body;
+    const { customerId, discount = 0, gst = 0, date, notes = '', is_tax_inclusive, valid_until, items } = req.body;
 
     const { store_id } = req.user;
 
@@ -173,6 +175,7 @@ router.post('/combined', protect, async (req, res) => {
                 gst,
                 discount,
                 notes,
+                is_tax_inclusive,
                 valid_until: parseDate(valid_until),
                 date: date ? new Date(date) : new Date(),
             })
@@ -225,7 +228,7 @@ router.put('/:id', protect, async (req, res) => {
     try {
 
         const { id } = req.params;
-        const { customerId, gst, discount, notes, valid_until, date, storeId } = req.body;
+        const { customerId, gst, discount, notes, valid_until, is_tax_inclusive, date, storeId } = req.body;
 
 
 
@@ -250,6 +253,7 @@ router.put('/:id', protect, async (req, res) => {
                 gst,
                 discount,
                 notes,
+                is_tax_inclusive,
                 // valid_until: valid_until && valid_until ? new Date(valid_until) : null,
                 valid_until: parseDate(valid_until),
                 date: date ? new Date(date) : new Date(),

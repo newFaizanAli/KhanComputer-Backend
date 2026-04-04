@@ -42,6 +42,10 @@ const invoiceWithCustomerQuery = (condition) => {
             discount: sale_invoices.discount,
             gst: sale_invoices.gst,
             order_reference_no: sale_invoices.order_reference_no,
+            is_tax_inclusive: sale_invoices.is_tax_inclusive,
+            payment_method: sale_invoices.payment_method,
+            payment_reference: sale_invoices.payment_reference,
+            payment_status: sale_invoices.payment_status,
             customerId: customers.id,
             customerName: customers.name,
             quotationId: quotations.id,
@@ -84,7 +88,8 @@ router.get('/', protect, async (req, resp) => {
 router.post('/', protect, async (req, res) => {
     try {
 
-        const { customerId, gst, discount, notes, order_reference_no, quotationId, date } = req.body;
+        const { customerId, gst, discount, notes, order_reference_no, quotationId,
+            is_tax_inclusive, payment_method, payment_reference, payment_status, date } = req.body;
         const { store_id } = req.user;
 
 
@@ -106,6 +111,10 @@ router.post('/', protect, async (req, res) => {
             notes: notes,
             quotationId: quotationId,
             order_reference_no: order_reference_no,
+            is_tax_inclusive: is_tax_inclusive,
+            payment_method: payment_method,
+            payment_reference: payment_reference,
+            payment_status: payment_status,
             date: date
                 ? new Date(date + "T00:00:00.000Z")
                 : new Date()
@@ -131,7 +140,9 @@ router.post('/', protect, async (req, res) => {
 
 router.post('/combined', protect, async (req, res) => {
 
-    const { customerId, discount = 0, gst = 0, date, notes = '', quotationId, order_reference_no, items } = req.body;
+    const { customerId, discount = 0, gst = 0, date, notes = '', quotationId, order_reference_no,
+        is_tax_inclusive, payment_method, payment_reference, payment_status, items,
+    } = req.body;
 
     const { store_id } = req.user;
 
@@ -178,6 +189,10 @@ router.post('/combined', protect, async (req, res) => {
                 discount,
                 notes,
                 order_reference_no,
+                is_tax_inclusive,
+                payment_method,
+                payment_reference,
+                payment_status,
                 date: date ? new Date(date) : new Date(),
             })
             .returning();
@@ -229,7 +244,8 @@ router.put('/:id', protect, async (req, res) => {
     try {
 
         const { id } = req.params;
-        const { customerId, gst, discount, notes, order_reference_no, date, quotationId, storeId } = req.body;
+        const { customerId, gst, discount, notes, order_reference_no, date, quotationId,
+            payment_method, payment_reference, payment_status, is_tax_inclusive, storeId } = req.body;
 
 
 
@@ -255,6 +271,10 @@ router.put('/:id', protect, async (req, res) => {
                 discount,
                 notes,
                 quotationId,
+                payment_method,
+                payment_reference,
+                payment_status,
+                is_tax_inclusive,
                 order_reference_no: order_reference_no,
                 date: date ? new Date(date) : new Date(),
                 storeId

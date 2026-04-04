@@ -1,0 +1,1 @@
+ALTER TABLE "quotations" ADD COLUMN "is_tax_inclusive" boolean DEFAULT false;
