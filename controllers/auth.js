@@ -95,7 +95,7 @@ router.post("/login", async (req, res) => {
             { id: user.id, store_id: store.id || null },
             process.env.JWT_SECRET,
             {
-                expiresIn: "60m",
+                expiresIn: "120m",
                 algorithm: "HS256",
             }
         );

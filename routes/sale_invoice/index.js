@@ -131,6 +131,7 @@ router.post('/', protect, async (req, res) => {
 
 router.post('/combined', protect, async (req, res) => {
 
+    const { customerId, discount = 0, gst = 0, date, notes = '', quotationId, order_reference_no, items } = req.body;
 
     const { store_id } = req.user;
 
