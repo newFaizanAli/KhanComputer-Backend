@@ -109,6 +109,20 @@ const sale_invoice_items = pgTable('sale_invoice_items', {
 
 
 
+const letter_heads = pgTable("letter_heads", {
+    id: serial("id").primaryKey(),
+    code: varchar('code', { length: 20 }).notNull().unique(),
+    storeId: integer("store_id")
+        .references(() => store_info.id, { onDelete: "cascade" })
+        .notNull(),
+    name: varchar("name", { length: 100 }).notNull(), // e.g.,  "Bank", "Client Submission", "Tax Authority", etc
+    header_text: text("header_text"), // optional header
+    footer_text: text("footer_text"), // optional footer
+    default_body: text("default_body"), // e.g., "Dear Sir/Madam, This is to certify..."
+    issued_at: timestamp("issued_at").defaultNow(),
+    notes: text("notes")
+});
+
 
 module.exports = {
     users,
@@ -117,5 +131,6 @@ module.exports = {
     quotations,
     quotation_items,
     sale_invoices,
-    sale_invoice_items
+    sale_invoice_items,
+    letter_heads
 }

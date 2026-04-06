@@ -1,10 +1,13 @@
 // routes/store.js
 const express = require("express");
-const { db } = require("../db");
-const { store_info } = require("../schemas");
 const { eq } = require("drizzle-orm");
+const { db } = require("../../db");
+const { store_info } = require("../../schemas");
+
 
 const app = express()
+
+app.use('/letter-heads', require('./letter_head'))
 
 // Get store info (first/default)
 app.get("/", async (req, res) => {
