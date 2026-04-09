@@ -10,8 +10,6 @@ const app = express()
 app.get('/', protect, async (req, res) => {
     try {
 
-        const { id } = req.user
-
 
         const allUsers = await db.select().from(users).where(
             ne(users.id, req.user.id) // exclude current user
@@ -28,9 +26,9 @@ app.get('/', protect, async (req, res) => {
 
 app.post('/', protect, async (req, res) => {
     try {
-        const { name, email, password } = req.body
+        const { name, email, password, role } = req.body
 
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !role) {
             return res.json({
                 success: false,
                 message: "Name, email, and password are required"
@@ -42,6 +40,7 @@ app.post('/', protect, async (req, res) => {
         const [newUser] = await db.insert(users).values({
             name,
             email,
+            role,
             password: hashedPassword,
         }).returning()
 
@@ -53,18 +52,21 @@ app.post('/', protect, async (req, res) => {
 
     } catch (e) {
         console.error(e.message)
-        res.status(500).json({ success: false, message: 'Server Error' })
+        res.json({ success: false, message: 'Server Error' })
     }
 })
 
 app.put('/:id', protect, async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, } = req.body;
+        const { name, email, role } = req.body;
+
+
 
         const [updateUser] = await db.update(users).set({
             ...(name && { name }),
             ...(email && { email }),
+            ...(role && { role }),
         }).where(eq(users.id, id)).returning();
 
         if (!updateUser) {
